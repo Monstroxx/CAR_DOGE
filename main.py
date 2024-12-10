@@ -24,6 +24,10 @@ control2 = {
     "d": pygame.K_RIGHT,
 }
 
+car1 = pygame.transform.scale(pygame.image.load("CAR_DOGE/Audi.png"), (50, 50))
+car1 = pygame.transform.rotate(car1, -90)
+car2 = pygame.transform.scale(pygame.image.load("CAR_DOGE/Car.png"), (50, 50))
+
 # Create game window
 gameDisplay = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption(caption)
@@ -32,7 +36,7 @@ pygame.display.set_caption(caption)
 Clock = pygame.time.Clock()
 
 class Car:
-    def __init__(self, color: tuple[int], pos: list[int], size: int, speed: float = 1, friction: float = 0.9):
+    def __init__(self, texture: str, pos: list[int], size: int, speed: float = 1, friction: float = 0.9):
         """
         Initialize the car object.
 
@@ -43,7 +47,12 @@ class Car:
             speed (float, optional): The speed at which the car moves. Defaults to 1.
             friction (float, optional): The amount of friction that slows down the car. Defaults to 0.9.
         """
-        self.color = color
+        self.Texture = pygame.image.load(texture)
+        self.Texture = pygame.transform.scale(self.Texture, (size, size))
+
+        self.TextureRot = pygame.transform.rotate(self.Texture, 180)
+
+
         self.position = pos
         self.size = size
         self.velocity = [0, 0]
@@ -52,7 +61,8 @@ class Car:
 
     def draw(self, screen: pygame.display):
         #Draw the car on the game window.
-        pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.size, self.size))
+        pygame.draw.rect(screen, (0,0,0), (self.position[0], self.position[1], self.size, self.size))
+        gameDisplay.blit(self.Texture, (self.position[0], self.position[1]))
 
     def move(self, KeyUp: int, KeyDown: int, Keyleft: int, KeyRight: int, minPos: list[int], maxPos: list[int]):
         """
@@ -68,6 +78,7 @@ class Car:
         # Update direction based on user input
         if keys[KeyUp]:
             dir[1] -= self.speed
+            self.Texture = pygame.transform.rotate(texture, -90)
         if keys[KeyDown]:
             dir[1] += self.speed
         if keys[Keyleft]:
@@ -107,11 +118,23 @@ class Car:
         self.velocity = [self.velocity[0] * self.friction, self.velocity[1] * self.friction]
 
 class NPC:
-    pass
+    def __init__(self, color: tuple[int], pos: list[int], size: int, speed: float = 1):
+        self.color = color
+        self.position = pos
+        self.size = size
+        self.speed = speed
+
+    def draw(self, screen: pygame.display):
+        #Draw the car on the game window.
+        pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.size, self.size))
+    
+    def move(self):
+        pass
+
 
 # Create a new Car object
-player = Car(color=(255, 0, 0), pos=(500, 500), size=50, speed=0.8)
-player2 = Car(color=(0, 0, 255), pos=(1000, 500), size=50, speed=0.8)
+player = Car(texture="CAR_DOGE/Car.png", pos=(500, 500), size=50, speed=0.8)
+player2 = Car(texture="CAR_DOGE/Audi.png", pos=(1000, 500), size=50, speed=0.8)
 
 # Game loop
 Run = True
