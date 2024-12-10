@@ -10,6 +10,20 @@ window_height = 600
 caption = "Car"
 FPS = 60
 
+control1 = {
+    "w": pygame.K_w,
+    "a": pygame.K_a,
+    "s": pygame.K_s,
+    "d": pygame.K_d,
+}
+
+control2 = {
+    "w": pygame.K_UP,
+    "a": pygame.K_LEFT,
+    "s": pygame.K_DOWN,
+    "d": pygame.K_RIGHT,
+}
+
 # Create game window
 gameDisplay = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption(caption)
@@ -37,13 +51,12 @@ class Car:
         self.speed = speed
 
     def draw(self, screen: pygame.display):
-        """Draw the car on the game window."""
+        #Draw the car on the game window.
         pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.size, self.size))
 
-    def move(self) -> None:
+    def move(self, KeyUp: int, KeyDown: int, Keyleft: int, KeyRight: int, minPos: list[int], maxPos: list[int]):
         """
         Move the car based on user input and friction.
-
         The car's velocity is updated based on the user's key presses.
         The friction then slows down the car to its original speed over time.
         """
@@ -53,13 +66,13 @@ class Car:
         dir = [0, 0]
 
         # Update direction based on user input
-        if keys[pygame.K_w]:
+        if keys[KeyUp]:
             dir[1] -= self.speed
-        if keys[pygame.K_s]:
+        if keys[KeyDown]:
             dir[1] += self.speed
-        if keys[pygame.K_a]:
+        if keys[Keyleft]:
             dir[0] -= self.speed
-        if keys[pygame.K_d]:
+        if keys[KeyRight]:
             dir[0] += self.speed
 
         # Normalize direction vector to ensure equal speed in all directions
@@ -80,21 +93,25 @@ class Car:
         self.position = [self.position[0] + self.velocity[0], self.position[1] + self.velocity[1]]
 
         # Keep car within game window boundaries
-        if self.position[0] > window_width - self.size:
-            self.position[0] = window_width - self.size
-        elif self.position[0] < 0:
-            self.position[0] = 0
+        if self.position[0] > maxPos[0] - self.size:
+            self.position[0] = maxPos[0] - self.size
+        elif self.position[0] < minPos[0]:
+            self.position[0] = minPos[0]
 
-        if self.position[1] > window_height - self.size:
-            self.position[1] = window_height - self.size
-        elif self.position[1] < 0:
-            self.position[1] = 0
+        if self.position[1] > maxPos[1] - self.size:
+            self.position[1] = maxPos[1] - self.size
+        elif self.position[1] < minPos[1]:
+            self.position[1] = minPos[1]
 
         # Apply friction to slow down car over time
         self.velocity = [self.velocity[0] * self.friction, self.velocity[1] * self.friction]
 
+class NPC:
+    pass
+
 # Create a new Car object
 player = Car(color=(255, 0, 0), pos=(500, 500), size=50, speed=0.8)
+player2 = Car(color=(0, 0, 255), pos=(1000, 500), size=50, speed=0.8)
 
 # Game loop
 Run = True
@@ -106,8 +123,10 @@ while Run:
 
     # Draw background and move player car
     gameDisplay.fill((0, 0, 0))
-    player.move()
+    player.move(control1["w"], control1["s"], control1["a"], control1["d"],[0,0],[window_width,window_height])
+    player2.move(control2["w"], control2["s"], control2["a"], control2["d"],[0,0],[window_width,window_height])
     player.draw(gameDisplay)
+    player2.draw(gameDisplay)
 
     # Update display
     pygame.display.update()

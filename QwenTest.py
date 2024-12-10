@@ -65,17 +65,3 @@ while running:
 # Quit Pygame
 pygame.quit()
 
-
-control1 = {
-    "w": pygame.K_w,
-    "a": pygame.K_a,
-    "s": pygame.K_s,
-    "d": pygame.K_d,
-}
-
-control2 = {
-    "u": pygame.K_UP,
-    "l": pygame.K_LEFT,
-    "d": pygame.K_DOWN,
-    "r": pygame.K_RIGHT,
-}
