@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 # Initialize Pygame
 pygame.init()
@@ -24,9 +25,6 @@ control2 = {
     "d": pygame.K_RIGHT,
 }
 
-car1 = pygame.transform.scale(pygame.image.load("CAR_DOGE/Audi.png"), (50, 50))
-car1 = pygame.transform.rotate(car1, -90)
-car2 = pygame.transform.scale(pygame.image.load("CAR_DOGE/Car.png"), (50, 50))
 
 # Create game window
 gameDisplay = pygame.display.set_mode((window_width, window_height))
@@ -78,13 +76,16 @@ class Car:
         # Update direction based on user input
         if keys[KeyUp]:
             dir[1] -= self.speed
-            self.Texture = pygame.transform.rotate(texture, -90)
+            self.Texture = pygame.transform.rotate(self.TextureRot, 180)
         if keys[KeyDown]:
             dir[1] += self.speed
+            self.Texture = pygame.transform.rotate(self.TextureRot, -360)
         if keys[Keyleft]:
             dir[0] -= self.speed
+            self.Texture = pygame.transform.rotate(self.TextureRot, -90)
         if keys[KeyRight]:
             dir[0] += self.speed
+            self.Texture = pygame.transform.rotate(self.TextureRot, 90)
 
         # Normalize direction vector to ensure equal speed in all directions
         norm = math.sin(45) * self.speed
@@ -118,24 +119,46 @@ class Car:
         self.velocity = [self.velocity[0] * self.friction, self.velocity[1] * self.friction]
 
 class NPC:
-    def __init__(self, color: tuple[int], pos: list[int], size: int, speed: float = 1):
+    def __init__(self, color: tuple[int], pos: list[int], size: int):
+
         self.color = color
-        self.position = pos
+        self.position : list[int] = pos
         self.size = size
-        self.speed = speed
+
+        self.spawn()
 
     def draw(self, screen: pygame.display):
         #Draw the car on the game window.
         pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.size, self.size))
     
+    def spawn(self):
+        #Spawn car npc at start
+        self.direction = int(random.choice([-1, 1])) #-1 for left
+        self.ran_start = random.randint(0, window_height - self.size)
+        
+        self.position[1] = self.ran_start
+        if self.direction == 1:
+            self.position[0] = 0
+        elif self.direction == -1:
+            self.position[0] = window_width -self.size
+        
+        self.speed: float = 1
+        self.speed = random.randint(4, 12)
+
     def move(self):
-        pass
+        #move car npc from start to end
+        self.position[0] += self.speed * self.direction
+
+        if self.position[0] > window_width + self.size or self.position[0] < 0 -self.size:
+            self.spawn()
 
 
 # Create a new Car object
 player = Car(texture="CAR_DOGE/Car.png", pos=(500, 500), size=50, speed=0.8)
 player2 = Car(texture="CAR_DOGE/Audi.png", pos=(1000, 500), size=50, speed=0.8)
 
+
+NPC1 = NPC(color=(255, 0, 0), pos=[0,0], size=50)
 # Game loop
 Run = True
 while Run:
@@ -150,6 +173,9 @@ while Run:
     player2.move(control2["w"], control2["s"], control2["a"], control2["d"],[0,0],[window_width,window_height])
     player.draw(gameDisplay)
     player2.draw(gameDisplay)
+
+    NPC1.move()
+    NPC1.draw(gameDisplay)
 
     # Update display
     pygame.display.update()
