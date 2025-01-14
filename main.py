@@ -25,6 +25,16 @@ control2 = {
     "d": pygame.K_RIGHT,
 }
 
+skins = {
+    'Car': "CAR_DOGE/Car.png",
+    'Audi': "CAR_DOGE/Audi.png",
+    'Ambulance': "CAR_DOGE/Ambulance.png",
+    'Mini_truck': "CAR_DOGE/Mini_truck.png",
+    'taxi': "CAR_DOGE/taxi.png",
+    'truck': "CAR_DOGE/truck.png",
+    'Minni_van': "CAR_DOGE/Minni_van.png",
+    'Black_viper': "CAR_DOGE/Black_viper.png",
+}
 
 # Create game window
 gameDisplay = pygame.display.set_mode((window_width, window_height))
@@ -119,17 +129,17 @@ class Car:
         self.velocity = [self.velocity[0] * self.friction, self.velocity[1] * self.friction]
 
 class NPC:
-    def __init__(self, color: tuple[int], pos: list[int], size: int):
+    def __init__(self, size: int):
 
-        self.color = color
-        self.position : list[int] = pos
+        self.position : list[int] = [0, 0]
         self.size = size
 
         self.spawn()
 
     def draw(self, screen: pygame.display):
         #Draw the car on the game window.
-        pygame.draw.rect(screen, self.color, (self.position[0], self.position[1], self.size, self.size))
+        pygame.draw.rect(screen, (0,0,0), (self.position[0], self.position[1], self.size, self.size))
+        gameDisplay.blit(self.Texture, (self.position[0], self.position[1]))
     
     def spawn(self):
         #Spawn car npc at start
@@ -145,6 +155,18 @@ class NPC:
         self.speed: float = 1
         self.speed = random.randint(4, 12)
 
+        texture_list = [skins["Car"], skins["Audi"], skins["Ambulance"], skins["Mini_truck"], skins["taxi"], skins["truck"], skins["Black_viper"]]#, skins["Minni_van"]
+
+        self.Texture = random.choice(texture_list)
+        self.Texture = pygame.image.load(self.Texture)
+        self.Texture = pygame.transform.scale(self.Texture, (self.size, self.size))
+        self.TextureRot = pygame.transform.rotate(self.Texture, 180)
+        if self.direction == 1:
+            self.Texture = pygame.transform.rotate(self.TextureRot, 90)
+        if self.direction == -1:
+            self.Texture = pygame.transform.rotate(self.TextureRot, -90)
+        self.TextureRot = pygame.transform.rotate(self.Texture, 180)
+
     def move(self):
         #move car npc from start to end
         self.position[0] += self.speed * self.direction
@@ -154,11 +176,12 @@ class NPC:
 
 
 # Create a new Car object
-player = Car(texture="CAR_DOGE/Car.png", pos=(500, 500), size=50, speed=0.8)
-player2 = Car(texture="CAR_DOGE/Audi.png", pos=(1000, 500), size=50, speed=0.8)
+player = Car(texture=skins['Car'], pos=(500, 500), size=50, speed=0.8)
+player2 = Car(texture=skins['Audi'], pos=(1000, 500), size=50, speed=0.8)
 
 
-NPC1 = NPC(color=(255, 0, 0), pos=[0,0], size=50)
+NPC1 = NPC(size=50)
+NPC2 = NPC(size=50)
 # Game loop
 Run = True
 while Run:
@@ -176,6 +199,8 @@ while Run:
 
     NPC1.move()
     NPC1.draw(gameDisplay)
+    NPC2.move()
+    NPC2.draw(gameDisplay)
 
     # Update display
     pygame.display.update()
