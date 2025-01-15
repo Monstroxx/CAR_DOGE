@@ -174,14 +174,43 @@ class NPC:
         if self.position[0] > window_width + self.size or self.position[0] < 0 -self.size:
             self.spawn()
 
+def collision():
+    #colission
+    if player[0].position[0] + player[0].size >= player[1].position[0] and player[0].position[0] <= player[1].position[0] + player[1].size:
+        if player[0].position[1] + player[0].size >= player[1].position[1] and player[0].position[1] <= player[1].position[1] + player[1].size:
+            player[0].position = [500, 500]
+            player[1].position = [1000, 500]
+
+    #collision with npc
+    for i in range(npc.__len__()):
+        if player[0].position[0] + player[0].size >= npc[i].position[0] and player[0].position[0] <= npc[i].position[0] + npc[i].size:
+            if player[0].position[1] + player[0].size >= npc[i].position[1] and player[0].position[1] <= npc[i].position[1] + npc[i].size:
+                player[0].position = [500, 500]
+                npc[i].spawn()
+        if player[1].position[0] + player[1].size >= npc[i].position[0] and player[1].position[0] <= npc[i].position[0] + npc[i].size:
+            if player[1].position[1] + player[1].size >= npc[i].position[1] and player[1].position[1] <= npc[i].position[1] + npc[i].size:
+                player[1].position = [1000, 500]
+                npc[i].spawn()
+
+    #collision npc with npc
+    for j in range(npc.__len__()):
+        if i != j:
+            if npc[i].position[0] + npc[i].size >= npc[j].position[0] and npc[i].position[0] <= npc[j].position[0] + npc[j].size:
+                if npc[i].position[1] + npc[i].size >= npc[j].position[1] and npc[i].position[1] <= npc[j].position[1] + npc[j].size:
+                    npc[i].spawn()
+                    npc[j].spawn()
+                    
 
 # Create a new Car object
-player = Car(texture=skins['Car'], pos=(500, 500), size=50, speed=0.8)
-player2 = Car(texture=skins['Audi'], pos=(1000, 500), size=50, speed=0.8)
+player = {}
+player[0] = Car(texture=skins['Car'], pos=(500, 500), size=50, speed=0.8)
+player[1] = Car(texture=skins['Audi'], pos=(1000, 500), size=50, speed=0.8)
 
+npc={}
+npc_num = 3
+for i in range(npc_num):
+    npc[i] = NPC(size=50)
 
-NPC1 = NPC(size=50)
-NPC2 = NPC(size=50)
 # Game loop
 Run = True
 while Run:
@@ -192,15 +221,18 @@ while Run:
 
     # Draw background and move player car
     gameDisplay.fill((0, 0, 0))
-    player.move(control1["w"], control1["s"], control1["a"], control1["d"],[0,0],[window_width,window_height])
-    player2.move(control2["w"], control2["s"], control2["a"], control2["d"],[0,0],[window_width,window_height])
-    player.draw(gameDisplay)
-    player2.draw(gameDisplay)
+    player[0].move(control1["w"], control1["s"], control1["a"], control1["d"],[0,0],[window_width,window_height])
+    player[1].move(control2["w"], control2["s"], control2["a"], control2["d"],[0,0],[window_width,window_height])
+    player[0].draw(gameDisplay)
+    player[1].draw(gameDisplay)
 
-    NPC1.move()
-    NPC1.draw(gameDisplay)
-    NPC2.move()
-    NPC2.draw(gameDisplay)
+    # Move and draw npc
+    for i in range(npc.__len__()):
+        npc[i].move()
+        npc[i].draw(gameDisplay)    
+
+    # Check for collisions
+    collision()
 
     # Update display
     pygame.display.update()
